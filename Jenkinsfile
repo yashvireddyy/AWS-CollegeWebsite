@@ -7,7 +7,6 @@ pipeline {
         REGION     = "ap-south-1"
         AWS_CLI    = "C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe"
         TERRAFORM  = "C:\\terraform_1.13.3_windows_386\\terraform.exe"
-    
     }
 
     stages {
@@ -43,11 +42,10 @@ pipeline {
         stage('Deploy with Terraform') {
             steps {
                 echo '🏗️ Deploying EC2 instance and running Docker container...'
-                withCredentials([usernamePassword(credentialsId: '207613818218', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                // Use AWS plugin credentials here
+                withAWS(credentials: '207613818218', region: '%REGION%') {
                     dir('terraform') {
                         bat """
-                        set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
-                        set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
                         "%TERRAFORM%" init
                         "%TERRAFORM%" apply -auto-approve
                         """
@@ -55,8 +53,6 @@ pipeline {
                 }
             }
         }
-
-        
     }
 
     post {
