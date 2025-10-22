@@ -6,7 +6,7 @@ pipeline {
         ECR_REPO   = "207613818218.dkr.ecr.ap-south-1.amazonaws.com/html-website"
         REGION     = "ap-south-1"
         AWS_CLI    = "C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe"
-        TERRAFORM  = "C:\\terraform_1.13.3_windows_386\\terraform.exe"
+        TERRAFORM  = "C:\\Terraform\\terraform.exe"
     }
 
     stages {
