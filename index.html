@@ -2,103 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="description" content="ABC College - Home" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ABC College | Home</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EcoBloom — Growing a Greener Future</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>
-  <img src="assets/logo.png" alt="ABC College Logo" width="56" height="56" />
-  <h1>ABC College</h1>
-  <nav>
-    <a href="index.html">Home</a> |
-    <a href="about.html">About</a> |
-    <a href="departments.html">Departments</a> |
-    <a href="courses.html">Courses</a> |
-    <a href="admissions.html">Admissions</a> |
-    <a href="events.html">Events</a> |
-    <a href="placements.html">Placements</a> |
-    <a href="faculty.html">Faculty</a> |
-    <a href="contact.html">Contact</a>
-  </nav>
-  <hr />
-</header>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="logo" href="index.html">EcoBloom</a>
+      <nav>
+        <ul class="nav">
+          <li><a class="active" href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="initiatives.html">Initiatives</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-<main>
-  <section>
-    <h2>Welcome</h2>
-    <figure>
-      <img src="assets/campus_hero.jpg" alt="ABC College Main Campus" />
-      <figcaption>Our campus fosters collaboration and curiosity.</figcaption>
-    </figure>
-    <p>Established in <strong>1990</strong>, ABC College offers undergraduate and postgraduate programs across Science, Commerce, Arts, and Management.</p>
-    <p>Open hours: <time datetime="09:00">9 AM</time> to <time datetime="17:00">5 PM</time>, Mon–Fri.</p>
+  <section class="hero hero--home">
+    <div class="container hero-inner">
+      <h1>Growing a Greener Future</h1>
+      <p>Together we enable communities to reduce waste, restore green spaces, and choose sustainable alternatives.</p>
+      <a class="btn" href="initiatives.html">Explore Initiatives</a>
+    </div>
   </section>
 
-  <section>
-    <h2>Quick Facts</h2>
-    <ul>
-      <!-- TODO(1): Add two more <li> items exactly as specified -->
-      <li>NAAC accredited with <mark>A+</mark> grade</li>
-      <li>Excellent faculty and student groups with <mark>15:300</mark> ratio per department</li>
-      <li>Placement oriented exposure with R&D Labs for innovation</li>
-      <!-- TODO(1A) -->
-      <!-- TODO(1B) -->
-    </ul>
+  <section class="features">
+    <div class="container grid-3">
+      <article class="card">
+        <h3>Reduce & Reuse</h3>
+        <p>Simple swaps and mindful habits that minimize waste in everyday life.</p>
+      </article>
+      <article class="card">
+        <h3>Community Gardens</h3>
+        <p>Local food, strong neighborhoods, and greener cities—one plot at a time.</p>
+      </article>
+      <article class="card">
+        <h3>Clean Energy</h3>
+        <p>Guides to adopt solar, save energy at home, and support renewables.</p>
+      </article>
+    </div>
   </section>
 
-  <section>
-    <h2>At a Glance</h2>
-    <table border="1" cellpadding="6">
-      <caption>Key Statistics</caption>
-      <thead>
-        <!-- TODO(2): Add header cells exactly as specified -->
-        <tr>
-          <th>Metric</th>
-          <th>Value</th>
-          <!-- TODO(2A) -->
-          <!-- TODO(2B) -->
-        </tr>
-      </thead>
-      <tbody>
-        <!-- TODO(3): Add three rows exactly as specified -->
-        <tr>
-          <td>Number of Departments</td>
-          <td>6</td>
-        </tr>
-        <tr>
-          <td>Number of Programs</td>
-          <td>7</td>
-        </tr>
-        <tr>
-          <td>Number of Clubs</td>
-          <td>4</td>
-        </tr>
-        
-        <!-- TODO(3A) -->
-        <!-- TODO(3B) -->
-        <!-- TODO(3C) -->
-      </tbody>
-    </table>
+  <section class="highlight">
+    <div class="container highlight-inner">
+      <h2>Monthly Tree Drive</h2>
+      <p>Join our volunteer teams to plant native trees in urban heat zones and school campuses.</p>
+      <a class="btn btn--ghost" href="contact.html">Volunteer with Us</a>
+    </div>
   </section>
 
-  <section style="display: grid">
-    <h2>Campus Tour (Optional Video)</h2>
-    <video width="640" controls>
-      <!-- TODO(4): Add <source> element exactly as specified -->
-      <!-- TODO(4A) -->
-      <source src="assets\campus.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-    <p><small>Place a real <code>campus.mp4</code> in <code>assets/</code> to enable playback.</small></p>
-  </section>
-</main>
-
-<footer>
-  <hr />
-  <address>ABC College, Knowledge Avenue, Hyderabad, India • +91-40-1234-5678</address>
-  <p>&copy; 2025 ABC College. All rights reserved.</p>
-</footer>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© 2025 EcoBloom • Built with HTML & CSS</p>
+      <p class="footer-tag">#SustainableLiving #ZeroWaste #UrbanGreening</p>
+    </div>
+  </footer>
 </body>
 </html>
