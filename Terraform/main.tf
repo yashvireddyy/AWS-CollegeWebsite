@@ -131,6 +131,6 @@ resource "aws_instance" "web" {
               EOF
 
   tags = {
-    Name = "CollegeWebsite-EC2"
+    Name = "EcoRiseWebsite-EC2"
   }
 }

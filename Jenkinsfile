@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "yashvi/college-website"
+        IMAGE_NAME = "yashvi/ecorise-website"
         ECR_REPO   = "207613818218.dkr.ecr.ap-south-1.amazonaws.com/html-website"
         REGION     = "ap-south-1"
         AWS_CLI    = "C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe"
@@ -13,7 +13,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo '📦 Cloning repository...'
-                git branch: 'main', url: 'https://github.com/yashvireddyy/AWS-CollegeWebsite.git'
+                git branch: 'main', url: 'https://github.com/yashvireddyy/CICD_pipeline_website'
             }
         }
 
