@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 # ------------------------------
-# Random ID (for unique IAM role name)
+# Random ID (for unique resource names)
 # ------------------------------
 resource "random_id" "suffix" {
   byte_length = 4
@@ -54,7 +54,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 # Security Group
 # ------------------------------
 resource "aws_security_group" "web_sg" {
-  name        = var.security_group_name
+  name_prefix = "jenkins-ec2-sg-"   # ✅ Dynamic name to avoid duplicates
   description = "Allow HTTP and SSH traffic"
 
   ingress {
@@ -81,7 +81,7 @@ resource "aws_security_group" "web_sg" {
   }
 
   tags = {
-    Name = "jenkins-ec2-sg-new"
+    Name = "jenkins-ec2-sg"
   }
 }
 
