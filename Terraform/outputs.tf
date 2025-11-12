@@ -12,3 +12,9 @@ output "ec2_instance_id" {
   description = "Instance ID"
   value       = aws_instance.web.id
 }
+
+output "alb_dns_name" {
+  description = "DNS name of Application Load Balancer"
+  value       = aws_lb.web_alb.dns_name
+}
+

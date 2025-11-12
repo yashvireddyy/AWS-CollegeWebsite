@@ -10,6 +10,7 @@ pipeline {
     }
 
     stages {
+
         stage('Clone Repository') {
             steps {
                 echo '📦 Cloning repository...'
@@ -20,36 +21,53 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Building Docker image...'
-                bat 'docker build -t %IMAGE_NAME%:latest .'
+                bat """
+                docker build -t ${env.IMAGE_NAME}:latest .
+                """
             }
         }
 
         stage('Push to AWS ECR') {
             steps {
-                echo '🚀 Pushing image to AWS ECR...'
-                withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                echo '🚀 Logging in and pushing image to AWS ECR...'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-ecr-creds'
+                ]]) {
                     bat """
-                    set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
-                    set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
-                    "%AWS_CLI%" ecr get-login-password --region %REGION% | docker login --username AWS --password-stdin %ECR_REPO%
-                    docker tag %IMAGE_NAME%:latest %ECR_REPO%:latest
-                    docker push %ECR_REPO%:latest
+                    "${env.AWS_CLI}" ecr get-login-password --region ${env.REGION} | docker login --username AWS --password-stdin ${env.ECR_REPO}
+                    docker tag ${env.IMAGE_NAME}:latest ${env.ECR_REPO}:latest
+                    docker push ${env.ECR_REPO}:latest
                     """
                 }
             }
         }
 
-        stage('Deploy with Terraform') {
+        stage('Deploy Infrastructure with Terraform') {
             steps {
-                echo '🏗️ Deploying EC2 instance and running Docker container...'
-                // Use AWS plugin credentials here
-                withAWS(credentials: '207613818218', region: '%REGION%') {
-                    dir('terraform') {
+                echo '🏗️ Deploying Auto Scaling and Load Balancer via Terraform...'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-ecr-creds'
+                ]]) {
+                    dir('terraform') {  // ✅ Ensure your .tf files are in a 'terraform' folder (or remove this block if not)
                         bat """
-                        "%TERRAFORM%" init
-                        "%TERRAFORM%" apply -auto-approve
+                        "${env.TERRAFORM}" init
+                        "${env.TERRAFORM}" plan -out=tfplan
+                        "${env.TERRAFORM}" apply -auto-approve tfplan
                         """
                     }
+                }
+            }
+        }
+
+        stage('Show Deployment Output') {
+            steps {
+                echo '🌐 Fetching deployed ALB DNS...'
+                dir('terraform') {
+                    bat """
+                    "${env.TERRAFORM}" output alb_dns_name
+                    """
                 }
             }
         }
@@ -57,11 +75,11 @@ pipeline {
 
     post {
         success {
-            echo '✅ Docker image pushed, EC2 deployed, and website is running!'
-            echo '🎉 Open the site in your browser using the EC2 Public IP or DNS.'
+            echo '✅ Build, push, and Terraform deployment completed successfully!'
+            echo '🎉 Your website is now live on AWS via Load Balancer (Auto Scaled).'
         }
         failure {
-            echo '❌ Build or deployment failed!'
+            echo '❌ Build or deployment failed. Please check the Jenkins logs.'
         }
     }
 }

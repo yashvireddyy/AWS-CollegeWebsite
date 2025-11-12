@@ -30,6 +30,7 @@ resource "aws_iam_role" "ec2_role" {
       }
     ]
   })
+  
 }
 
 # Attach ECR Read-Only Access
