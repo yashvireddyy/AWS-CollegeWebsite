@@ -32,3 +32,4 @@ output "load_balancer_dns" {
   description = "DNS of Application Load Balancer"
   value       = aws_lb.web_alb.dns_name
 }
+

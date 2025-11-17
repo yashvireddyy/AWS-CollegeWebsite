@@ -5,8 +5,8 @@ pipeline {
         IMAGE_NAME = "yashvi/ecorise-website"
         ECR_REPO   = "207613818218.dkr.ecr.ap-south-1.amazonaws.com/html-website"
         REGION     = "ap-south-1"
-        AWS_CLI    = "C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe"
-        TERRAFORM  = "C:\\Terraform\\terraform.exe"
+        AWS_CLI    = "aws"
+        TERRAFORM  = "terraform"
     }
 
     stages {
@@ -21,8 +21,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Building Docker image...'
-                bat """
-                docker build -t ${env.IMAGE_NAME}:latest .
+                sh """
+                docker build -t ${IMAGE_NAME}:latest .
                 """
             }
         }
@@ -30,14 +30,16 @@ pipeline {
         stage('Push to AWS ECR') {
             steps {
                 echo '🚀 Logging in and pushing image to AWS ECR...'
-                withCredentials([[
+                withCredentials([[ 
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-ecr-creds'
                 ]]) {
-                    bat """
-                    "${env.AWS_CLI}" ecr get-login-password --region ${env.REGION} | docker login --username AWS --password-stdin ${env.ECR_REPO}
-                    docker tag ${env.IMAGE_NAME}:latest ${env.ECR_REPO}:latest
-                    docker push ${env.ECR_REPO}:latest
+                    sh """
+                    ${AWS_CLI} ecr get-login-password --region ${REGION} | \
+                    docker login --username AWS --password-stdin ${ECR_REPO}
+
+                    docker tag ${IMAGE_NAME}:latest ${ECR_REPO}:latest
+                    docker push ${ECR_REPO}:latest
                     """
                 }
             }
@@ -45,16 +47,16 @@ pipeline {
 
         stage('Deploy Infrastructure with Terraform') {
             steps {
-                echo '🏗️ Deploying Auto Scaling and Load Balancer via Terraform...'
-                withCredentials([[
+                echo '🏗️ Deploying Auto Scaling & Load Balancer using Terraform...'
+                withCredentials([[ 
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-ecr-creds'
                 ]]) {
-                    dir('terraform') {  // ✅ Ensure your .tf files are in a 'terraform' folder (or remove this block if not)
-                        bat """
-                        "${env.TERRAFORM}" init
-                        "${env.TERRAFORM}" plan -out=tfplan
-                        "${env.TERRAFORM}" apply -auto-approve tfplan
+                    dir('terraform') {
+                        sh """
+                        ${TERRAFORM} init
+                        ${TERRAFORM} plan -out=tfplan
+                        ${TERRAFORM} apply -auto-approve tfplan
                         """
                     }
                 }
@@ -63,10 +65,10 @@ pipeline {
 
         stage('Show Deployment Output') {
             steps {
-                echo '🌐 Fetching deployed ALB DNS...'
+                echo '🌐 Fetching ALB DNS name...'
                 dir('terraform') {
-                    bat """
-                    "${env.TERRAFORM}" output alb_dns_name
+                    sh """
+                    ${TERRAFORM} output alb_dns_name
                     """
                 }
             }
@@ -75,11 +77,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build, push, and Terraform deployment completed successfully!'
-            echo '🎉 Your website is now live on AWS via Load Balancer (Auto Scaled).'
+            echo '✅ Deployment successful!'
         }
         failure {
-            echo '❌ Build or deployment failed. Please check the Jenkins logs.'
+            echo '❌ Build or deployment failed. See logs.'
         }
     }
 }
