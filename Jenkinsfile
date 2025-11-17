@@ -30,13 +30,20 @@ pipeline {
         stage('Push to AWS ECR') {
             steps {
                 echo '🚀 Logging in and pushing image to AWS ECR...'
-                withCredentials([[ 
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-ecr-creds'
-                ]]) {
+
+                // Using simple Jenkins credentials instead of AWS plugin
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+
                     sh """
-                    ${AWS_CLI} ecr get-login-password --region ${REGION} | \
-                    docker login --username AWS --password-stdin ${ECR_REPO}
+                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                    aws configure set default.region ${REGION}
+
+                    aws ecr get-login-password --region ${REGION} | \
+                        docker login --username AWS --password-stdin ${ECR_REPO}
 
                     docker tag ${IMAGE_NAME}:latest ${ECR_REPO}:latest
                     docker push ${ECR_REPO}:latest
@@ -48,12 +55,19 @@ pipeline {
         stage('Deploy Infrastructure with Terraform') {
             steps {
                 echo '🏗️ Deploying Auto Scaling & Load Balancer using Terraform...'
-                withCredentials([[ 
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-ecr-creds'
-                ]]) {
-                    dir('terraform') {
+
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+
+                    dir('Terraform') {   // <-- Correct folder name
+
                         sh """
+                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                        aws configure set default.region ${REGION}
+
                         ${TERRAFORM} init
                         ${TERRAFORM} plan -out=tfplan
                         ${TERRAFORM} apply -auto-approve tfplan
@@ -66,9 +80,9 @@ pipeline {
         stage('Show Deployment Output') {
             steps {
                 echo '🌐 Fetching ALB DNS name...'
-                dir('terraform') {
+                dir('Terraform') {    // <-- Correct folder
                     sh """
-                    ${TERRAFORM} output alb_dns_name
+                    terraform output alb_dns_name
                     """
                 }
             }
@@ -77,10 +91,11 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo '✅ Deployment completed successfully!'
+            echo '🎉 Website deployed on AWS using Jenkins + Docker + Terraform!'
         }
         failure {
-            echo '❌ Build or deployment failed. See logs.'
+            echo '❌ Build or deployment failed. Please check the console logs.'
         }
     }
 }
